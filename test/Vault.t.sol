@@ -24,7 +24,7 @@ contract TestVault is Test {
     function setUp() public {
         clip = new Clip();
         usdcToken = clip.usdcToken();
-        vault = new Vault(usdcToken);
+        vault = new Vault(clip, usdcToken);
 
         user1 = makeAddr("USER1");
         user2 = makeAddr("USER2");
@@ -36,7 +36,7 @@ contract TestVault is Test {
         vm.startPrank(user1);
 
         // Check if reverts for amount greater than the limit
-        vm.expectRevert("Amount should be less than or equal to 20 ether");
+        vm.expectRevert("Amount shouldn't exceed 20ETH");
         vault.depositEth{value: 30 ether}();
 
         vault.depositEth{value: 20 ether}();
