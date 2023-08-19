@@ -20,10 +20,10 @@ contract TestClip is Test {
 
     function testReleaseRewards() public {
         // Create a vault
-        Vault vault = new Vault(clip.usdcToken());
+        Vault vault = new Vault(clip, clip.usdcToken());
 
         vm.prank(clip.owner());
-        vm.expectRevert("Time has not passed for releasing rewards!");
+        vm.expectRevert("Rewards release time not reached");
         clip.releaseRewards(vault);
 
         vm.warp(block.timestamp + clip.i_interval() + 1);
@@ -33,7 +33,7 @@ contract TestClip is Test {
         clip.releaseRewards(vault);
 
         // Test for the second time pass of release rewards within interval time
-        vm.expectRevert("Time has not passed for releasing rewards!");
+        vm.expectRevert("Rewards release time not reached");
         clip.releaseRewards(vault);
 
         assertEq(

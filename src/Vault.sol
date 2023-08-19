@@ -1,21 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
+import {Clip} from "./Clip.sol";
 import {USDCToken} from "./USDCToken.sol";
 
 contract Vault {
-    USDCToken public usdcToken;
+    Clip private immutable clip;
+    USDCToken private immutable usdcToken;
+    address private immutable owner;
 
-    address[] public stakers;
+    address[] private stakers;
     uint public totalStackingBalance;
     mapping(address => uint) public stakingBalance;
     mapping(address => uint) public rewardAmount;
-    mapping(address => bool) public hasStaked;
+    mapping(address => bool) private hasStaked;
 
     uint public s_lastTimeStamp;
     uint private stakersCountPerWeek;
-    uint public constant MAX_STAKERS_PER_WEEK = 20;
-    uint public constant MAX_STAKE_AMOUNT = 20 ether;
+    uint constant MAX_STAKERS_PER_WEEK = 20;
+    uint constant MAX_STAKE_AMOUNT = 20 ether;
 
     event UnstakedAndRewardsTransferred(
         address indexed staker,
@@ -23,18 +26,34 @@ contract Vault {
         uint indexed rewardAmount
     );
 
-    constructor(USDCToken _usdcToken) {
+    // event Logging(address addr);
+
+    // modifier onlyClipOrVaultOwner() {
+    //     emit Logging(msg.sender);
+    //     emit Logging(owner);
+    //     emit Logging(address(Clip(msg.sender).owner()));
+
+    //     require(
+    //         msg.sender == owner || msg.sender == clip.owner(),
+    //         "Not authorized"
+    //     );
+    //     _;
+    // }
+
+    constructor(Clip _clip, USDCToken _usdcToken) {
+        clip = _clip;
         usdcToken = _usdcToken;
         s_lastTimeStamp = block.timestamp;
         stakersCountPerWeek = 0;
+        owner = msg.sender;
     }
 
-    function depositEth() public payable {
+    function depositEth() external payable {
         if (msg.value < 0) {
-            revert("amount cannot be 0");
+            revert("Amount cannot be 0"); // 18
         }
         if (msg.value > MAX_STAKE_AMOUNT) {
-            revert("Amount should be less than or equal to 20 ether");
+            revert("Amount shouldn't exceed 20ETH");
         }
         if (stakersCountPerWeek >= MAX_STAKERS_PER_WEEK) {
             revert("Stakers allowed per week exceeds");
@@ -52,13 +71,13 @@ contract Vault {
     }
 
     // Unstaking Tokens (Withdraw)
-    function claimRewards() public payable {
+    function claimRewards() external payable {
         // Fetch staking balance
         uint balance = stakingBalance[msg.sender];
         uint rewardAmountOfSender = rewardAmount[msg.sender];
 
         if (balance <= 0) {
-            revert("No Staking balance available for the user");
+            revert("No Staking balance available.");
         }
 
         stakingBalance[msg.sender] = 0;
@@ -76,7 +95,7 @@ contract Vault {
         );
     }
 
-    function distributeRewards() public {
+    function distributeRewards() external {
         uint totalRewardsAvailable = usdcToken.balanceOf(address(this));
         uint noOfStakers = stakers.length;
 
@@ -91,7 +110,7 @@ contract Vault {
         stakersCountPerWeek = 0;
     }
 
-    function setLastTimeStampOfRewards(uint _timestamp) public {
+    function setLastTimeStampOfRewards(uint _timestamp) external {
         s_lastTimeStamp = _timestamp;
     }
 }

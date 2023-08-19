@@ -8,7 +8,7 @@ contract Clip {
     address public owner;
     USDCToken public usdcToken;
 
-    uint public i_interval = 604800; // 1 week
+    uint public constant i_interval = 604800; // 1 week
     uint public constant WEEKLY_REWARDS = 1000 ether;
     uint public constant TREASURY_AMOUNT = 5000 ether;
 
@@ -20,16 +20,15 @@ contract Clip {
     }
 
     modifier onlyClipOwner() {
-        require(msg.sender == owner, "Only Clip owner can call this function.");
+        require(msg.sender == owner, "Accessed by Clip owner only.");
         _;
     }
 
     // Releases rewards to Vault
-    function releaseRewards(Vault _vault) public onlyClipOwner {
-        require(
-            (block.timestamp - _vault.s_lastTimeStamp() > i_interval),
-            "Time has not passed for releasing rewards!"
-        );
+    function releaseRewards(Vault _vault) external onlyClipOwner {
+        if (block.timestamp - _vault.s_lastTimeStamp() < i_interval) {
+            revert("Rewards release time not reached");
+        }
 
         _vault.setLastTimeStampOfRewards(block.timestamp);
 
