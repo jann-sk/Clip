@@ -20,7 +20,9 @@ contract Clip {
     }
 
     modifier onlyClipOwner() {
-        require(msg.sender == owner, "Accessed by Clip owner only.");
+        if (msg.sender != owner) {
+            revert("Accessed by Clip owner only.");
+        }
         _;
     }
 

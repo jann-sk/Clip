@@ -1,0 +1,19 @@
+TestClip:testReleaseRewards() (gas: 577786)
+TestVault:testDistributeRewards() (gas: 506879)
+TestVault:testStakeTokens() (gas: 160481)
+TestVault:testStakersAllowedPerWeek() (gas: 2240717)
+TestVault:testunstakeTokensAndRewards() (gas: 221104)
+
+// Revert Strings optimized
+TestClip:testReleaseRewards() (gas: 534443)
+TestVault:testDistributeRewards() (gas: 506812)
+TestVault:testStakeTokens() (gas: 160389)
+TestVault:testStakersAllowedPerWeek() (gas: 2240056)
+TestVault:testunstakeTokensAndRewards() (gas: 221104)
+
+// Variables visibility updated
+TestClip:testReleaseRewards() (gas: 490008)
+TestVault:testDistributeRewards() (gas: 502009)
+TestVault:testStakeTokens() (gas: 160304)
+TestVault:testStakersAllowedPerWeek() (gas: 2234750)
+TestVault:testunstakeTokensAndRewards() (gas: 217300)
